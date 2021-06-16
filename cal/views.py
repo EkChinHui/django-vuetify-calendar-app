@@ -38,6 +38,3 @@ def index(request):
         event_to_add = Event(name=name, start=start, end=end)
         event_to_add.save()
         return HttpResponse("posting event")
-
-def test(request):
-    return render(request, 'mysite.html')
