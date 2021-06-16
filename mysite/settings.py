@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import dj_database_url
 from pathlib import Path
 import os
+import dotenv
 import django_heroku
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -92,17 +94,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'dv-calendar',
-#         'USER': 'postgres',
-#         'PASSWORD': 'password',
-#         'PORT': '5432',
-#         'HOST': 'localhost'
-#     }
-# }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -141,7 +132,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = ['static', os.path.join(BASE_DIR, 'build/css'), os.path.join(BASE_DIR, 'build/js')]
+STATICFILES_DIRS = ['static', os.path.join(
+    BASE_DIR, 'build/css'), os.path.join(BASE_DIR, 'build/js')]
 STATIC_ROOT = 'var/static_root/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -150,14 +142,15 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
+
 django_heroku.settings(locals())
 
-# import psycopg2
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(
+    conn_max_age=600)
 
-# DATABASE_URL = os.environ['DATABASE_URL']
-
-# conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-
-import dj_database_url
-
-DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+options = DATABASES['default'].get('OPTIONS', {})
+options.pop('sslmode', None)

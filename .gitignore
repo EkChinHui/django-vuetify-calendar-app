@@ -1,5 +1,5 @@
 node_modules/
 cal/**/*.pyc
 mysite/**/*.pyc
-dist/
-build/
+.env
+db.sqlite3
