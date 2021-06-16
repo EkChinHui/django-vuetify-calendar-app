@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-i!*j=ixdzow9++da#8s=erdfcv@j*&4gky#a*z)dl+q70)zx1%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['http://192.168.0.230:8080', 'localhost', 'django-vue-calendar-fe-app.herokuapp.com']
+ALLOWED_HOSTS = ['http://192.168.0.230:8080', 'localhost',
+                 'django-vue-calendar-fe-app.herokuapp.com']
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
@@ -61,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
