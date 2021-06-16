@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-i!*j=ixdzow9++da#8s=erdfcv@j*&4gky#a*z)dl+q70)zx1%
 DEBUG = True
 
 ALLOWED_HOSTS = ['http://192.168.0.230:8080', 'localhost',
-                 'django-vue-calendar-fe-app.herokuapp.com']
+                 'django-vue-calendar-fe.herokuapp.com']
 
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
