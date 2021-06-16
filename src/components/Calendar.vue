@@ -197,7 +197,7 @@ export default {
       let data = {};
       let event = null;
       axios
-        .get("http://localhost:8000/calendar/", { headers: {} })
+        .get("https://django-vue-calendar.herokuapp.com/calendar/", { headers: {} })
         .then((res) => {
           data = res.data.events;
           for (let i = 0; i < data.length; i++) {
@@ -230,7 +230,7 @@ export default {
         if (validDates) {
           let event = this.createEvent(this.name, this.startDate, this.endDate);
           axios
-            .post("http://localhost:8000/calendar/", JSON.stringify(event), {
+            .post("https://django-vue-calendar.herokuapp.com/calendar/", JSON.stringify(event), {
               headers: {},
             })
             .then((res) => {
@@ -248,7 +248,7 @@ export default {
       } else if (this.name && this.startDate) {
         let event = this.createEvent(this.name, this.startDate, this.startDate);
         axios
-          .post("http://localhost:8000/calendar/", JSON.stringify(event), {
+          .post("https://django-vue-calendar.herokuapp.com/calendar/", JSON.stringify(event), {
             headers: {},
           })
           .then((res) => {
@@ -285,7 +285,7 @@ export default {
     removeEvent() {
       axios
         .delete(
-          "http://localhost:8000/calendar/",
+          "https://django-vue-calendar.herokuapp.com/calendar/",
           { data: JSON.stringify(this.selectedEvent) },
           {
             headers: {},
