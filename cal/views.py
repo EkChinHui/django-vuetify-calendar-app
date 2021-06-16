@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 
 
-@csrf_exempt
+# @csrf_exempt
 def index(request):
     if (request.method == "GET"):
         all_events = Event.objects.all()
@@ -38,3 +38,6 @@ def index(request):
         event_to_add = Event(name=name, start=start, end=end)
         event_to_add.save()
         return HttpResponse("posting event")
+
+def test(request):
+    return render(request, 'mysite.html')

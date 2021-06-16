@@ -27,18 +27,19 @@ SECRET_KEY = 'django-insecure-i!*j=ixdzow9++da#8s=erdfcv@j*&4gky#a*z)dl+q70)zx1%
 DEBUG = True
 
 ALLOWED_HOSTS = ['http://192.168.0.230:8080', 'localhost',
-                 'django-vue-calendar-fe.herokuapp.com']
+                 'django-vue-calendar-fe.herokuapp.com', '127.0.0.1']
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
-    'https://localhost:8080', 'http://192.168.0.230:8080',
+    'https://localhost:8080', 'http://192.168.0.230:8080', '127.0.0.1'
 )
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080", 'http://192.168.0.230:8080',
+    "http://localhost:8080", 'http://192.168.0.230:8080', 'http://127.0.0.1'
 ]
 
+CSRF_COOKIE_NAME = "csrftoken"
 
 # Application definition
 
@@ -71,7 +72,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'build')],
+        'DIRS': [os.path.join(BASE_DIR, 'static/src/vue/dist'), BASE_DIR/"templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,8 +140,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'build/css'), os.path.join(BASE_DIR, 'build/js')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'build')
+STATICFILES_DIRS = ['static', os.path.join(BASE_DIR, 'build/css'), os.path.join(BASE_DIR, 'build/js')]
+STATIC_ROOT = 'var/static_root/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
