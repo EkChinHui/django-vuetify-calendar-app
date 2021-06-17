@@ -29,8 +29,6 @@ def index(request):
         return HttpResponse(response)
     elif (request.method == "POST"):
         event_dict = json.loads(request.body)
-        print(event_dict)
-
         name = event_dict["name"]
         start = event_dict["start"]
         end = event_dict["end"]

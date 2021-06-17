@@ -143,7 +143,6 @@
               Cancel
             </v-btn>
             <v-btn text color="red" @click="removeEvent">
-              <!-- <v-icon>mdi-calendar-remove</v-icon> -->
               Remove
             </v-btn>
           </v-card-actions>
@@ -196,22 +195,20 @@ export default {
       const events = [];
       let data = {};
       let event = null;
-      axios
-        .get("https://django-vue-calendar.herokuapp.com/calendar/", { headers: {} })
-        .then((res) => {
-          data = res.data.events;
-          for (let i = 0; i < data.length; i++) {
-            event = data[i];
+      axios.get(process.env.VUE_APP_ROOT_API, { headers: {} }).then((res) => {
+        data = res.data.events;
+        for (let i = 0; i < data.length; i++) {
+          event = data[i];
 
-            events.push({
-              name: event["name"],
-              start: event["start"],
-              end: event["end"],
-              color: "blue",
-              timed: false,
-            });
-          }
-        });
+          events.push({
+            name: event["name"],
+            start: event["start"],
+            end: event["end"],
+            color: "blue",
+            timed: false,
+          });
+        }
+      });
       this.events = events;
     },
     getEventColor(event) {
@@ -230,7 +227,7 @@ export default {
         if (validDates) {
           let event = this.createEvent(this.name, this.startDate, this.endDate);
           axios
-            .post("https://django-vue-calendar.herokuapp.com/calendar/", JSON.stringify(event), {
+            .post(process.env.VUE_APP_ROOT_API, JSON.stringify(event), {
               headers: {},
             })
             .then((res) => {
@@ -248,7 +245,7 @@ export default {
       } else if (this.name && this.startDate) {
         let event = this.createEvent(this.name, this.startDate, this.startDate);
         axios
-          .post("https://django-vue-calendar.herokuapp.com/calendar/", JSON.stringify(event), {
+          .post(process.env.VUE_APP_ROOT_API, JSON.stringify(event), {
             headers: {},
           })
           .then((res) => {
@@ -285,7 +282,7 @@ export default {
     removeEvent() {
       axios
         .delete(
-          "https://django-vue-calendar.herokuapp.com/calendar/",
+          process.env.VUE_APP_ROOT_API,
           { data: JSON.stringify(this.selectedEvent) },
           {
             headers: {},
