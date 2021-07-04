@@ -3,5 +3,6 @@ cal/**/*.pyc
 mysite/**/*.pyc
 .env
 db.sqlite3
-/static
-/var
+static/
+var/
+staticfiles/

@@ -17,11 +17,15 @@ from mysite.settings import BASE_DIR
 from django.urls import path, include, re_path
 from django.contrib import admin
 from django.views.generic import TemplateView
-import os
+from rest_framework import routers
+from cal import views
 
+# router = routers.DefaultRouter()
+# router.register(r'events', views.EventViewSet)
 
 urlpatterns = [
-    path('', include('cal.urls')),
-    path('admin/', admin.site.urls),
-    re_path('.*', TemplateView.as_view(template_name="index.html"))# template_name=os.path.join(BASE_DIR, '/build/index.html')))
+    path('api/', include('cal.urls')),
+    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # path('admin/', admin.site.urls),
+    re_path('.*', TemplateView.as_view(template_name="index.html"))
 ]

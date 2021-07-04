@@ -1,38 +1,37 @@
 from django.shortcuts import render
 
 # Create your views here.
-from django.http import HttpResponse
 from cal.models import Event
-from django.core import serializers
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
+from cal.serializers import EventSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Event
 
+@api_view(['GET'])
+def apiOverview(request):
+    api_urls = {
+        'List':'/event-list/',
+        # 'Detail View':'/event-list/<str:pk>/',
+        'Create':'/event-create/',
+        'Delete':'/event-delete/<str:pk>/'
+    }
+    return Response(api_urls)
 
-@csrf_exempt
-def index(request):
-    if (request.method == "GET"):
-        all_events = Event.objects.all()
-        json_events = []
-        for event in all_events:
-            json_events.append(event.getJsonValues())
-        return JsonResponse({"events": json_events})
-    elif (request.method == "DELETE"):
-        event_dict = json.loads(request.body)
+@api_view(['GET'])
+def eventList(request):
+    events = Event.objects.all()
+    serializer = EventSerializer(events, many=True)
+    return Response(serializer.data)
 
-        name = event_dict["name"]
-        start = event_dict["start"]
-        end = event_dict["end"]
+@api_view(['POST'])
+def eventCreate(request):
+    serializer = EventSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)
 
-        response = Event.objects.filter(
-            name=name, start=start, end=end).delete()
-        return HttpResponse(response)
-    elif (request.method == "POST"):
-        event_dict = json.loads(request.body)
-        name = event_dict["name"]
-        start = event_dict["start"]
-        end = event_dict["end"]
-
-        event_to_add = Event(name=name, start=start, end=end)
-        event_to_add.save()
-        return HttpResponse("posting event")
+@api_view(['DELETE'])
+def eventDelete(request, pk):
+    event = Event.objects.get(id=pk)
+    event.delete()
+    return Response('Item successfully deleted!')

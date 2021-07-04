@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = ['http://192.168.0.230:8080', 'localhost',
                  'django-vue-calendar-fe.herokuapp.com', '127.0.0.1']
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -75,7 +76,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'static/src/vue/dist'), BASE_DIR/"templates"],
+        'DIRS': [os.path.join(BASE_DIR, 'static/dist')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,9 +133,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = ['static', os.path.join(
-    BASE_DIR, 'build/css'), os.path.join(BASE_DIR, 'build/js')]
-STATIC_ROOT = 'var/static_root/'
+STATICFILES_DIRS = ['static']
+# STATIC_ROOT = 'staticfiles'S
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type

@@ -22,18 +22,9 @@ This is an assignment to attain an internship but I thought it was a good chance
 2. Python
 3. Django
 
-## Frontend
-
 ```
-cd ./frontend
-npm i
-npm run serve
-```
-
-## Backend
-
-```
-cd ./backend
 pip install -r requirements.txt
+npm run build:dev
+python manage.py collectstatic
 python manage.py runserver
 ```

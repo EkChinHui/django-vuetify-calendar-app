@@ -13,12 +13,13 @@
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
 
-      <v-btn icon class="ml-2" @click="$refs.calendar.next()">
-        <v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
       <v-toolbar-title v-if="$refs.calendar" class="ml-6">
         {{ $refs.calendar.title }}
       </v-toolbar-title>
+
+      <v-btn icon class="ml-2" @click="$refs.calendar.next()">
+        <v-icon>mdi-chevron-right</v-icon>
+      </v-btn>
     </v-sheet>
 
     <v-dialog
@@ -28,25 +29,30 @@
     >
       <v-card>
         <v-container>
-          <v-form @submit.prevent="newEvent">
+          <v-form @submit.prevent="submitForm">
             <v-layout col wrap>
               <v-text-field
-                v-model="name"
+                v-model="eventForm.name"
                 type="text"
                 label="Name"
+              ></v-text-field>
+              <v-text-field
+                v-model="eventForm.description"
+                type="message"
+                label="Description"
               ></v-text-field>
               <v-menu
                 ref="startmenu"
                 v-model="startmenu"
                 :close-on-content-click="false"
-                :return-value.sync="startDate"
+                :return-value.sync="eventForm.start"
                 transition="scale-transition"
                 offset-y
                 min-width="auto"
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-combobox
-                    v-model="startDate"
+                    v-model="eventForm.start"
                     chips
                     small-chips
                     label="Start date"
@@ -56,7 +62,7 @@
                     v-on="on"
                   ></v-combobox>
                 </template>
-                <v-date-picker v-model="startDate" no-title scrollable>
+                <v-date-picker v-model="eventForm.start" no-title scrollable>
                   <v-spacer></v-spacer>
                   <v-btn text color="primary" @click="startmenu = false">
                     Cancel
@@ -64,7 +70,7 @@
                   <v-btn
                     text
                     color="primary"
-                    @click="$refs.startmenu.save(startDate)"
+                    @click="$refs.startmenu.save(eventForm.start)"
                   >
                     OK
                   </v-btn>
@@ -75,14 +81,14 @@
                 ref="endmenu"
                 v-model="endmenu"
                 :close-on-content-click="false"
-                :return-value.sync="endDate"
+                :return-value.sync="eventForm.end"
                 transition="scale-transition"
                 offset-y
                 min-width="auto"
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-combobox
-                    v-model="endDate"
+                    v-model="eventForm.end"
                     chips
                     small-chips
                     label="End date (optional)"
@@ -92,7 +98,7 @@
                     v-on="on"
                   ></v-combobox>
                 </template>
-                <v-date-picker v-model="endDate" no-title scrollable>
+                <v-date-picker v-model="eventForm.end" no-title scrollable>
                   <v-spacer></v-spacer>
                   <v-btn text color="primary" @click="endmenu = false">
                     Cancel
@@ -100,7 +106,7 @@
                   <v-btn
                     text
                     color="primary"
-                    @click="$refs.endmenu.save(endDate)"
+                    @click="$refs.endmenu.save(eventForm.end)"
                   >
                     OK
                   </v-btn>
@@ -142,9 +148,7 @@
             <v-btn text color="secondary" @click="selectedOpen = false">
               Cancel
             </v-btn>
-            <v-btn text color="red" @click="removeEvent">
-              Remove
-            </v-btn>
+            <v-btn text color="red" @click="removeEvent"> Remove </v-btn>
           </v-card-actions>
         </v-card>
       </v-menu>
@@ -166,7 +170,7 @@
 
 <script>
 import axios from "axios";
-import { isAfter, parseISO } from "date-fns";
+import { isAfter, isSameDay, parseISO } from "date-fns";
 
 export default {
   data: () => ({
@@ -179,28 +183,34 @@ export default {
     selectedEvent: {},
     selectedOpen: false,
     dialog: false,
-    name: "",
     startmenu: "",
     endmenu: "",
-    startDate: "",
-    endDate: "",
     openAlert: false,
     alert: "",
+    eventForm: {
+      name: "",
+      description: "",
+      start: "",
+      end: "",
+    },
   }),
   mounted() {
     this.getEvents();
+    axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+    axios.defaults.xsrfCookieName = 'csrftoken'
   },
   methods: {
-    getEvents(/*{ start, end }*/) {
+    getEvents() {
       const events = [];
       let data = {};
       let event = null;
-      axios.get(process.env.VUE_APP_ROOT_API, { headers: {} }).then((res) => {
-        data = res.data.events;
+      axios.get("/api/event-list/", { headers: {} }).then((res) => {
+        data = res.data;
         for (let i = 0; i < data.length; i++) {
           event = data[i];
 
           events.push({
+            id: event["id"],
             name: event["name"],
             start: event["start"],
             end: event["end"],
@@ -220,46 +230,24 @@ export default {
     setToday() {
       this.focus = "";
     },
-    newEvent() {
-      if (this.name && this.startDate && this.endDate) {
-        // check for validation if start > end
-        let validDates = this.areDatesValid(this.startDate, this.endDate);
-        if (validDates) {
-          let event = this.createEvent(this.name, this.startDate, this.endDate);
-          axios
-            .post(process.env.VUE_APP_ROOT_API, JSON.stringify(event), {
-              headers: {},
-            })
-            .then((res) => {
-              console.log(res);
-              this.getEvents();
-            });
-
-          // clear fields
-          this.name = "";
-          this.startDate = "";
-          this.endDate = "";
-        } else {
-          this.displayAlert("Start Date has to be before or same as End Date");
-        }
-      } else if (this.name && this.startDate) {
-        let event = this.createEvent(this.name, this.startDate, this.startDate);
-        axios
-          .post(process.env.VUE_APP_ROOT_API, JSON.stringify(event), {
-            headers: {},
-          })
-          .then((res) => {
-            console.log(res);
-            this.getEvents();
-          });
-
-        // clear fields
-        this.name = "";
-        this.startDate = "";
-        this.endDate = "";
-      } else {
-        this.displayAlert("Name and Start Date are required");
+    submitForm() {
+      let data = this.validateForm();
+      if (!data) {
+        return;
       }
+      console.log(data)
+      axios
+        .post("/api/event-create/", data, {
+          headers: {}
+        })
+        .then((res) => {
+          console.log(res);
+          this.getEvents();
+        });
+      // clear fields
+      this.name = "";
+      this.start = "";
+      this.end = "";
     },
     showEvent({ nativeEvent, event }) {
       const open = () => {
@@ -282,7 +270,7 @@ export default {
     removeEvent() {
       axios
         .delete(
-          process.env.VUE_APP_ROOT_API,
+          "/api/event-delete/"+this.selectedEvent.id+"/",
           { data: JSON.stringify(this.selectedEvent) },
           {
             headers: {},
@@ -294,12 +282,34 @@ export default {
           this.getEvents();
         });
     },
-    createEvent(name, startDate, endDate) {
-      let event = { name: name, start: startDate, end: endDate };
-      return event;
+    validateForm() {
+      // check for required fields
+      let name = this.eventForm.name
+      let start = this.eventForm.start
+      let end = this.eventForm.end
+
+      if (name && start) {
+        end = !end ? start : end;
+        if (!this.areDatesValid(start, end)) {
+          // trigger end date error
+          this.displayAlert("Start Date has to be before or same as End Date");
+          return;
+        }
+        return {
+          name: name,
+          description: this.eventForm.description,
+          start: start,
+          end: end,
+        };
+      } else {
+        // trigger required field error
+        this.displayAlert("Name and Start Date are required");
+      }
     },
-    areDatesValid(startDate, endDate) {
-      return isAfter(parseISO(endDate), parseISO(startDate));
+    areDatesValid(start, end) {
+      let startDate = parseISO(start)
+      let endDate = parseISO(end)
+      return isAfter(endDate, startDate) || isSameDay(startDate, endDate);
     },
     displayAlert(message) {
       this.alert = message;
