@@ -13,7 +13,7 @@
         <v-icon>mdi-chevron-left</v-icon>
       </v-btn>
 
-      <v-toolbar-title v-if="$refs.calendar" class="ml-6">
+      <v-toolbar-title v-if="$refs.calendar" class="text-center">
         {{ $refs.calendar.title }}
       </v-toolbar-title>
 
@@ -144,6 +144,9 @@
             <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
             <v-spacer></v-spacer>
           </v-toolbar>
+          <v-card-text v-text="selectedEvent.description">
+          <v-spacer></v-spacer>
+          </v-card-text>
           <v-card-actions class="d-flex justify-space-around">
             <v-btn text color="secondary" @click="selectedOpen = false">
               Cancel
@@ -212,6 +215,7 @@ export default {
           events.push({
             id: event["id"],
             name: event["name"],
+            description: event["description"],
             start: event["start"],
             end: event["end"],
             color: "blue",
@@ -245,9 +249,10 @@ export default {
           this.getEvents();
         });
       // clear fields
-      this.name = "";
-      this.start = "";
-      this.end = "";
+      this.eventForm.name = "";
+      this.eventForm.description = "";
+      this.eventForm.start = "";
+      this.eventForm.end = "";
     },
     showEvent({ nativeEvent, event }) {
       const open = () => {

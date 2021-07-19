@@ -6,3 +6,6 @@ db.sqlite3
 static/
 var/
 staticfiles/
+Scripts/
+Lib/
+.vscode

@@ -12,7 +12,7 @@ This is an assignment to attain an internship but I thought it was a good chance
 
 1. Vue (Vuetify)
 2. Django
-3. SQLite 3 (database)
+3. PostgreSQL (database)
 
 # Setting up
 
